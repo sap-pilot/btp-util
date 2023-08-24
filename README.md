@@ -45,7 +45,7 @@ usage:
     3. run below command to export service key
         export cpiServiceKey='<CONDENSED_CPI_SERVICE_KEY>'
     3. run below command to download all integration artifacts into current folder
-        source <(curl -s https://raw.githubusercontent.com/sap-pilot/btp-util/main/integration/int-download-all.sh)
+        bash <(curl -s https://raw.githubusercontent.com/sap-pilot/btp-util/main/integration/int-download-all.sh)
 
 result:
 

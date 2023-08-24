@@ -6,7 +6,7 @@
 # 3. run below command to export service key
 #     export cpiServiceKey='<CONDENSED_CPI_SERVICE_KEY>'
 # 3. run below command to download all integration artifacts into current folder
-#     source <(curl -s https://raw.githubusercontent.com/sap-pilot/btp-util/main/integration/int-download-all.sh)
+#     bash <(curl -s https://raw.githubusercontent.com/sap-pilot/btp-util/main/integration/int-download-all.sh)
 #
 # result:
 #   - All integration arfiacts will be downloaded into current folder with structure  below
@@ -29,17 +29,17 @@ IFS=$OLD_IFS
 basicAuth=$(echo "$cpi_oauth_clientid:$cpi_oauth_clientsecret")
 printf "\n# Getting Token from SAP Process Runtime Service (it-rt.api)...\n"
 curl --silent -u "$basicAuth" -X GET "$cpi_oauth_tokenurl?grant_type=client_credentials" > tmp-cpi-token.json
-cat tmp-cpi-token.json
+cat tmp-cpi-token.json ; echo
 export cpiToken=$(jq -r '.access_token' tmp-cpi-token.json)
 
 # download list of cpi packages
 printf "\n# Get CPI Packages...\n"
 curl --silent -H "Authorization:Bearer $cpiToken" -H "Accept: application/json" -X  GET "$cpi_oauth_url/api/v1/IntegrationPackages" > tmp-packages.json
-cat tmp-packages.json
+cat tmp-packages.json ; echo
 
 # flattern json into list of package ids
 jq -r ".d.results[].Id" tmp-packages.json > tmp-packages.txt
-cat tmp-packages.txt
+cat tmp-packages.txt ; echo
 
 # handling packages one by one
 OLD_IFS=$IFS
@@ -47,18 +47,30 @@ IFS=$'\n' # make newlines the only separator
 for p in $(cat tmp-packages.txt); do
     iflowUrl="$cpi_oauth_url/api/v1/IntegrationPackages('$p')/\$value"
     echo "# Downloading Package '$p' from '$iflowUrl'"
-    curl --silent -H "Authorization:Bearer $cpiToken" -X GET "$iflowUrl" -o tmp-package-$p.zip
+    curl -H "Authorization:Bearer $cpiToken" -X GET "$iflowUrl" -L -o tmp-package-$p.zip
     unzip tmp-package-$p.zip -d $p
+    if [ ! -d "$p" ] ; then
+        echo "# - Error: not able to unzip package from tmp-package-$p.zip (see content below)"
+        cat tmp-package-$p.zip ; echo
+        rm tmp-package-$p.zip
+        continue
+    fi
     files="$p/*_content"
     for f in $files
     do 
         echo "# - Processing $f"
         unzip $f -d tmp-artifact
-        # extract artifact <name> from .project
-        artifactName=`awk -F "[><]" '/name/{print $3}' tmp-artifact/.project | head -1`
-        echo "# - Extracted artifactName=$artifactName"
-        echo "# - Move artifact to $p/$artifactName"
-        mv tmp-artifact $p/$artifactName
+        if [ ! -f "tmp-artifact/.project" ] ; then
+            echo "# - Error: not able to unzip or no .project presented in $f"
+            # TODO: try to extract artifact name from META-INF/MANIFEST.MF?
+            rm -rf tmp-artifact            
+        else
+            # extract artifact <name> from .project
+            artifactName=`awk -F "[><]" '/name/{print $3}' tmp-artifact/.project | head -1`
+            echo "# - Extracted artifactName=$artifactName"
+            echo "# - Move artifact to $p/$artifactName"
+            mv tmp-artifact $p/$artifactName
+        fi
         # delete the zip file
         rm $f 
     done
