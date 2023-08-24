@@ -1,9 +1,15 @@
-# Download all integration artifacts and extract it to specified folder
-# Useage:
-#  1. export cpiServiceKey=<YOUR_CPI_SERVICE_KEY> - service key of Process Integration Runtime instance with "api" plan (condense into single line)
-#  2. source ./int-download-all.sh
-# Outcome:
-#   - All integration arfiacts will be downloaded into local folder with structure like below
+# Download all integration artifacts and extract it to current folder
+#
+# Usage:
+# 1. generate then copy the service key of Process Integration Runtime instance with "api" plan (with "AuthGroup_IntegrationDeveloper" role)
+# 2. condense the service key into single line for instance replaceAll("\n(\s)*',"")
+# 3. run below command to export service key
+#     export cpiServiceKey='<CONDENSED_CPI_SERVICE_KEY>'
+# 3. run below command to download all integration artifacts into current folder
+#     source <(curl -s https://raw.githubusercontent.com/sap-pilot/btp-util/main/integration/int-download-all.sh)
+#
+# result:
+#   - All integration arfiacts will be downloaded into current folder with structure  below
 #       - <PACKAGE_ID>
 #           - <IFLOW_NAME>
 #               - <IFLOW FILES>
