@@ -129,7 +129,17 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# SAP BTP mtar deployment file
+*.mtar
 
 # env files
 *-env.json
 *-env.txt
+
+# service keys & auth-token
+*-key.json
+*-token.json
+
+# tmp folder
+tmp/
+tmp-*
