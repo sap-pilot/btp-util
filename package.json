@@ -1,0 +1,37 @@
+{
+  "name": "@sap-pilot/btp-util",
+  "version": "0.0.1",
+  "description": "Utilities for BTP administration and development",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sap-pilot/btp-util.git"
+  },
+  "keywords": [
+    "SAP",
+    "BTP",
+    "CAP"
+  ],
+  "author": "Da Chen",
+  "license": "MIT",
+  "files": [
+    "cf/",
+    "integration/",
+    "tms/",
+    "cap/",
+    "index.js",
+    "common.cds",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "bugs": {
+    "url": "https://github.com/sap-pilot/btp-util/issues"
+  },
+  "homepage": "https://github.com/sap-pilot/btp-util#readme",
+  "dependencies": {
+    "@sap/cds": "^7.2.1"
+  }
+}
